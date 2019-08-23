@@ -3,16 +3,17 @@
 .DEFAULT_GOAL := all
 WORKING_DIR   := .
 BUILD_DIR     := $(WORKING_DIR)/build
-MK_CFG_NAME   := conf.mk
+MAKE_ARGS     := -C $(WORKING_DIR) BUILD_DIR=$(BUILD_DIR) \
+                 WORKING_DIR=$(WORKING_DIR)
 
-# expose utilities
-include $(WORKING_DIR)/mk/utils.mk
+build-%:
+	$(MAKE) -f $(WORKING_DIR)/mk/build.mk $(MAKE_ARGS) \
+		$(BUILD_DIR)/$*.elf
 
-# aggregate sources
-include $(WORKING_DIR)/src/$(MK_CFG_NAME)
+run-%: build-%
+	$(BUILD_DIR)/$*.elf
 
-all:
-	+@echo $(LIB_SRCS) $(APP_SRCS)
+all: run-test
 
 clean:
 	rm -rf $(BUILD_DIR)
