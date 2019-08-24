@@ -1,4 +1,4 @@
-.PHONY: clean all
+.PHONY: clean all format
 
 .DEFAULT_GOAL   := all
 WORKING_DIR     := .
@@ -11,6 +11,9 @@ build-%:
 	$(MAKE) -f $(WORKING_DIR)/mk/build.mk $(MAKE_ARGS) \
 		$(BUILD_DIR)/$*.elf
 
+container-%:
+	$(MAKE) -f $(WORKING_DIR)/docker/build.mk $(MAKE_ARGS) $*
+
 run-%: build-%
 	$(BUILD_DIR)/$*.elf
 
@@ -18,7 +21,7 @@ format:
 	find $(WORKING_DIR) -iname *.h -o -iname *.cpp | \
 		xargs clang-format -i -style=$(CLANG_FMT_STYLE) -fallback-style=none
 
-all: run-test
+all: container-image run-test
 
 clean:
 	rm -rf $(BUILD_DIR)
